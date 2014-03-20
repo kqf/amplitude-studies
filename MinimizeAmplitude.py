@@ -113,7 +113,6 @@ class PerformMinimization(object):
         self.canvas.Update()
 
 def fitFunc(x, p):
-    # return 40
     return fit_function(x, p)
 
 
