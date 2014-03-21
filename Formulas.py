@@ -16,7 +16,13 @@ def fit_function(x, par):
 
     return sigma_tot
 
+def a_amplitude(s, t,  par):
+    # TODO: check how to write down gauge amplitude
+    return 1.
+
+
 def H_amplitude(x, par):
+    # This case needs explicit coefitient assignment:
     g_p, g_f, g_w, alpha_p, alpha_p0, alpha_f, alpha_f0, alpha_w, alpha_w0, lamda, Bp, Bf, Bw, s, pt = par
     alpha  = [alpha_p, alpha_f, alpha_w]
     alpha0 = [alpha_p0, alpha_f0, alpha_w0]
@@ -38,6 +44,22 @@ def H_amplitude(x, par):
 
     H = h / ( -0.5 * L * h + complex(1, 0) )
     return (H * x).imag
+
+def H_amplitude_numerical(x, par):
+    # Explicit coefitients assignment:
+    # TODO: THIS MUST BE REPLACED:
+    # TODO: How to pass parameters properly ???
+
+    s = par[13]
+
+    # g_p, g_f, g_w, alpha_p, alpha_p0, alpha_f, alpha_f0, alpha_w, alpha_w0, lamda, Bp, Bf, Bw, s, pt = par
+
+    f_real = lambda x: a_amplitude(s, x, par).real
+    h_real = (1. / 8 * pi * s) * integrate.quad(f_real, 0, numpy.inf)[0]
+
+    f_imag = lambda x: a_amplitude(s, x, par).imag
+    h_imag = (1. / 8 * pi * s) * integrate.quad(f_imag, 0, numpy.inf)[0]
+    h = complex(h_real, h_imag)
 
 
 def A_amplitude(s, par):
