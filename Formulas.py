@@ -6,6 +6,11 @@ from math import sqrt
 from cmath import exp, log, pi
 import numpy
 
+
+N_PARAMETERS_PER_POLE = 4
+N_POLES = 3
+
+
 def fit_function(x, par):
     k =   0.3893797
     m_p = 0.9382700
@@ -16,9 +21,18 @@ def fit_function(x, par):
 
     return sigma_tot
 
+def partial_amplitude(s, t, p):
+    """ Naiv but cruicial design. Values of paramenters
+        0  - g
+        1  - alpha
+        2  - alpha_prime
+        3  - B 
+    """
+    return p[0] * (-1j*s) ** (p[1] - p[1]*t) * exp(- p[3]*t)
+
 def a_amplitude(s, t,  par):
-    # TODO: check how to write down gauge amplitude
-    return 1.
+    """ Total gauge amplitude"""
+    return sum( [ partial_amplitude(s, t, p) for p in par ] )
 
 
 def H_amplitude(x, par):
@@ -54,11 +68,14 @@ def H_amplitude_numerical(x, par):
 
     # g_p, g_f, g_w, alpha_p, alpha_p0, alpha_f, alpha_f0, alpha_w, alpha_w0, lamda, Bp, Bf, Bw, s, pt = par
 
-    f_real = lambda x: a_amplitude(s, x, par).real
+    parameters = rearrange_parameters(par)
+
+    f_real = lambda x: a_amplitude(s, x, parameters).real
     h_real = (1. / 8 * pi * s) * integrate.quad(f_real, 0, numpy.inf)[0]
 
-    f_imag = lambda x: a_amplitude(s, x, par).imag
+    f_imag = lambda x: a_amplitude(s, x, parameters).imag
     h_imag = (1. / 8 * pi * s) * integrate.quad(f_imag, 0, numpy.inf)[0]
+
     h = complex(h_real, h_imag)
 
 
@@ -71,5 +88,19 @@ def A_amplitude(s, par):
 
     f = lambda x: H_amplitude(x, parameters)
     return integrate.quad(f, 0, numpy.inf)[0]  # integral  zero to lower 
+
+def rearrange_parameters(par):
+    """
+          Simple convertation from one input parameters ordering convention to another.
+          Output parameters presented in for of 2d list:
+              [ [g1, a1, ap1, B1],
+                ... 
+
+                [gn, an, apn, Bn]]
+
+    """
+    return [ [ par[i] for i in range(n, len(par), N_PARAMETERS_PER_POLE)] for n in range(N_POLES)]
+
+
 
 
