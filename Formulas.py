@@ -6,6 +6,7 @@ from math import sqrt
 from cmath import exp, log, pi
 
 import numpy
+import scipy.special as sf
 
 
 N_PARAMETERS_PER_POLE = 4
@@ -19,9 +20,17 @@ def fit_function(x, par):
     s = x[0] ** 2
     flux = sqrt( ( s - 2 * m_p ** 2 ) ** 2 - 4 * m_p ** 4 )
     sigma_tot = (k / flux) * (8 * pi * s ) * A_amplitude(s, par)
-    print sigma_tot
-
+    print 'sigma total = ' , sigma_tot
     return sigma_tot
+
+    # parameters = [ p for p in par ]
+    # parameters.append(s)
+    # # For simga_{tot} -- t is unecessary. It is placed here as reminder
+    # t = 0
+    # parameters.append(t)
+
+    # print H_amplitude(1, parameters), H_amplitude_numerical(1, parameters)
+    # return 40
 
 def partial_amplitude(s, t, p):
     """ Naiv but cruicial design. Values of parameters
@@ -30,7 +39,9 @@ def partial_amplitude(s, t, p):
         2  - alpha_prime
         3  - B 
     """
-    return p[0] * (-1j*s) ** (p[1] - p[2]*t) * exp(- p[3]*t)
+
+    coef = -1 if p[0] > 0 else 1j
+    return p[0] * (-1j*s) ** (p[1] - p[2]*t) * exp(- p[3]*t) * coef
 
 def a_amplitude(s, t,  par):
     """ Total gauge amplitude"""
@@ -63,7 +74,7 @@ def H_amplitude(x, par):
 
     H = h / ( -0.5 * L * h + complex(1, 0) )
 
-    return (H * x).imag
+    return H
 
 def H_amplitude_numerical(x, par):
     """Numerical approach"""
@@ -76,10 +87,10 @@ def H_amplitude_numerical(x, par):
     parameters = rearrange_parameters(par)
 
 
-    f_real = lambda x: a_amplitude(s, x, parameters).real
+    f_real = lambda q: a_amplitude(s, q*q, parameters).real * q * sf.j0(q * x)
     h_real = (1. /( 8 * pi * s ) ) * integrate.quad(f_real, 0, numpy.inf)[0]
 
-    f_imag = lambda x: a_amplitude(s, x, parameters).imag
+    f_imag = lambda q: a_amplitude(s, q*q, parameters).imag * q * sf.j0(q * x)
     h_imag = (1. /( 8 * pi * s ) ) * integrate.quad(f_imag, 0, numpy.inf)[0]
 
     h = complex(h_real, h_imag)
@@ -100,10 +111,10 @@ def A_amplitude(s, par):
     parameters.append(t)
 
 
-    # f = lambda x: H_amplitude(x, parameters)
-    f = lambda x: H_amplitude_numerical(x, parameters).imag
+    # f = lambda b: H_amplitude(b, parameters).imag * b  
+    f = lambda b: H_amplitude_numerical(b, parameters).imag * b
 
-    return integrate.quad(f, 0, numpy.inf)[0]  # integral  zero to lower 
+    return integrate.quad(f, 0, 40)[0]  # integral  zero to lower 
 
 def rearrange_parameters(par):
     """
@@ -119,5 +130,6 @@ def rearrange_parameters(par):
     # g_p, g_f, g_w, alpha_p, alpha_p0, alpha_f, alpha_f0, alpha_w, alpha_w0, lamda, Bp, Bf, Bw, s, pt = par
     pomeron = [ par[0], par[4], par[3], par[10] ]
     f_regge = [ par[1], par[6], par[5], par[11] ]
-    w_regge = [ par[2], par[8], par[7], par[12] ]
+    w_regge = [ -par[2], par[8], par[7], par[12] ]
+
     return [pomeron, f_regge, w_regge]
