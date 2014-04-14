@@ -20,17 +20,9 @@ def fit_function(x, par):
     s = x[0] ** 2
     flux = sqrt( ( s - 2 * m_p ** 2 ) ** 2 - 4 * m_p ** 4 )
     sigma_tot = (k / flux) * (8 * pi * s ) * A_amplitude(s, par)
+
     print 'sigma total = ' , sigma_tot
     return sigma_tot
-
-    # parameters = [ p for p in par ]
-    # parameters.append(s)
-    # # For simga_{tot} -- t is unecessary. It is placed here as reminder
-    # t = 0
-    # parameters.append(t)
-
-    # print H_amplitude(1, parameters), H_amplitude_numerical(1, parameters)
-    # return 40
 
 def partial_amplitude(s, t, p):
     """ Naiv but cruicial design. Values of parameters
