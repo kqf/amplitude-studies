@@ -9,6 +9,8 @@ import seaborn
 import numpy as np
 import matplotlib.pyplot as plt
 
+from minuitmethod import MinuitMethod
+
 def iterations(x, a):
 	res = minimize(rosen, x, method=a, tol=1e-6)
 	try:
@@ -30,7 +32,7 @@ def scan(n = 4, ntrials = 10):
 	# , 'dogleg'
 	# , 'trust-ncg'	
 	# , 'COBYLA'
-	algorithms = 'Nelder-Mead', 'Powell', 'CG', 'BFGS', 'L-BFGS-B', 'TNC', 'SLSQP'
+	algorithms = 'Nelder-Mead', 'Powell', 'CG', 'BFGS', 'L-BFGS-B', 'TNC', 'SLSQP', MinuitMethod()
 
 	results = [check(data, a) for a in algorithms]
 	mean_iterations = {a: i for a, (i, e) in zip(algorithms, results) if i > 0.0}
