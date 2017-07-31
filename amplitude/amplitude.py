@@ -4,11 +4,12 @@ from ROOT import *
 from DataPoint import *
 from Formulas import fit_function
 
-class PerformMinimization(object):
+class DataManager(object):
     canvas = TCanvas('canvas', 'Non linear trajectories', 800, 600)
     datasets = [110, 210, 310, 111, 211, 311]
 
-    def __init__(self):
+    def __init__(self, infile):
+        self.infile = infile
         self.data = []
         self.title = "#sigma_{pp}"
         [ self.read_data(i) for i in self.datasets ]
@@ -28,7 +29,7 @@ class PerformMinimization(object):
            6 -- id of the observable
         """
         raw_data = []
-        with open('alldata_v1_4.dat','r') as file:
+        with open(self.infile,'r') as file:
             for line in file:
                 data = line.lower().split()
 
@@ -37,24 +38,13 @@ class PerformMinimization(object):
                 if dataset_in_file != dataset:
                     continue
 
-                energy = float(data[0])
-                t      = float(data[1])
-
-                if self.draw_cut(energy, t):
-                    continue
-
-                observable = float(data[2])
-                error      = float(data[3])
+                energy, t, observable, error = map(float, data[0:4])
 
                 raw_data.append( DataPoint(energy, t,
                     observable, error, dataset) )
 
         self.data.append(raw_data)
 
-
-    def draw_cut(self, energy, t):
-        """Check if data is within draw range"""
-        return False
 
     def create_graph(self, name, data):
         """Creates TGraphErrors, with differential cross section data"""
@@ -63,12 +53,10 @@ class PerformMinimization(object):
         graph.SetName(name)
         graph.SetTitle(name + " graph")
 
-        if data[0].dtype // 300 == 1:
-            [ graph.SetPoint(i, p.t, p.observable) for i, p in enumerate(data) ]
-        else:
-            [ graph.SetPoint(i, p.energy, p.observable) for i, p in enumerate(data) ]
-
-        [ graph.SetPointError(i, 0, p.error) for i, p in enumerate(data) ]
+        for i, p in enumerate(data):
+            x =  p.t if (data[0].dtype // 300 == 1) else p.energy
+            graph.SetPoint(i, x, p.observable)
+            graph.SetPointError(i, 0, p.error)
 
         graph.GetXaxis().SetTitle('#sqrt{s}, GeV')
         graph.GetYaxis().SetTitle('#frac{d#sigma}{dt}, mb/GeV^{2}')
@@ -78,22 +66,10 @@ class PerformMinimization(object):
         return graph
 
     def plot(self):
-        # self.canvas.Divide(3, 2)
-        # self.canvas.Divide(3, 2)
-
         self.canvas.cd(1)
         gPad.SetLogy()
         gPad.SetLogx()
         self.graphs[0].Draw("AP")
-
-
-
-        # [ [self.canvas.cd(i + 1),
-            # gPad.SetLogy(),
-            # gPad.SetLogx(),
-            # g.Draw("AP")] for i, g in enumerate(self.graphs)]
-
-
         self.canvas.Update()
         self.data_is_drawn = True # needed to keep track of draw parameters
 
@@ -102,18 +78,16 @@ class PerformMinimization(object):
         self.canvas.cd(1)
         # TODO: write normal input data handler
         
-        parameters = [ 40.3043,117.221,102.76,0.35,1.10517,1.31638,0.791348,1.2,0.5,0.160351,2.32537,1.98679,8.80651]
+        parameters = [40.3043, 117.221, 102.76,0.35,1.10517,1.31638,0.791348,1.2,0.5,0.160351,2.32537,1.98679,8.80651]
 
         # TODO: remove hardocded numbers
-        func = TF1('func',fitFunc, 5, 3000, len(parameters))
+        func = TF1('func', fit_function, 5, 3000, len(parameters))
         [ func.SetParameter(i, p) for i, p in enumerate(parameters) ]
 
         func.Draw('APL same' if self.data_is_drawn else 'APL')
         self.canvas.cd(1)
         self.canvas.Update()
 
-def fitFunc(x, p):
-    return fit_function(x, p)
 
 
 def main():
