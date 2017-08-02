@@ -35,7 +35,7 @@ class Model(object):
         # Explicit coefitients assignment:
         # TODO: THIS MUST BE REPLACED:
         # TODO: How to pass pjarameters properly ???
-        s, lamda, parameters = self.rearrange_parameters(par)
+        s, parameters = self.rearrange_parameters(par)
         f_real = lambda q: self.a_amplitude(s, q*q, parameters).real * q * sf.j0(q * x)
         h_real = (1. /( 8 * pi * s ) ) * integrate.quad(f_real, 0, numpy.inf)[0]
 
@@ -44,6 +44,7 @@ class Model(object):
 
         h = complex(h_real, h_imag)
 
+        lamda = par[9]
         L = complex(0, 2 * lamda)
 
         H = h / ( -0.5 * L * h + complex(1, 0) )
@@ -65,7 +66,7 @@ class Model(object):
         return integrate.quad(f, 0, 40)[0]  # integral  zero to lower 
 
     def rearrange_parameters(self, par):
-        return par[-1], par[-2], [par[0:4], par[4:8], par[8:12]]
+        return par[-1], [par[0:4], par[4:8], par[8:12]]
 
         
 class AnalyticalModel(Model):
