@@ -1,4 +1,10 @@
 *.pyc
 alldata_v1_4.dat
-
-
+*.dat
+*.pdf
+*.png
+*.inp
+*.in 
+*.sublime-project
+*.sublime-workspace
+*.sortie

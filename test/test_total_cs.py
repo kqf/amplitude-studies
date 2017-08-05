@@ -5,6 +5,7 @@ import json
 import unittest
 from amplitude.DataPoint import DataPoint
 from amplitude.models import Model
+from amplitude.amplitude import DataManager
 
 
 class TestTotalCrossSection(unittest.TestCase):
@@ -12,7 +13,7 @@ class TestTotalCrossSection(unittest.TestCase):
 
     def setUp(self):
         self.cscode =  110
-        self.parameters = [40.3043, 1.10517, 0.35, 2.32537, 1, 117.221, 0.791348, 1.31638, 1.98679, 1, 102.76, 0.5, 1.2, 8.80651, -1, 0.5]
+        self.parameters = DataManager.parameters()
         data = DataPoint.read_data('alldata_v1_4.dat', [self.cscode])
         self.energy = [x.energy for x in data[self.cscode]]
 

@@ -41,7 +41,7 @@ class DataPoint(object):
         return raw_data
 
     @staticmethod
-    def read_data(infile, datasets):
+    def read_data(infile, datasets = [110, 111, 210, 211, 310, 311]):
         raw_data = {d: DataPoint.read_dataset(infile, d) for d in datasets}
         return raw_data
 
