@@ -46,13 +46,9 @@ class AnalyticAmplitude(Amplitude):
         super(AnalyticAmplitude, self).__init__()
 
     def h_(self, s, x):
-        S = -1j * s
-        logS_a = log(S ** self.alpha)
-        res = ( (self.g / (16. * pi * s))
-              * ( ( S ** self.alpha0 ) / ( logS_a + self.B) )
-              * exp( -(x / 2.) ** 2  / ( logS_a + self.B) )
-             )
-        return res
+        cdllp = log(-1j * s)
+        rf2 = self.B + self.alpha * cdllp 
+        return self.g * exp(self.alpha0 * cdllp) * (0.5 / rf2) * exp(-0.25 * x ** 2 / rf2) / (8 * pi * s)
 
     @staticmethod
     def h_amplitude(poles, s, x):

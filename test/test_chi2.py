@@ -13,7 +13,7 @@ class TestTotalCrossSection(unittest.TestCase):
 
     def setUp(self):
         self.model, self.parameters = Model('triples'), Parameter.parameters()
-        self.data = DataPoint.read_data('alldata_v1_4.dat')
+        self.data = DataPoint.read_data('dsdtout.dat')
 
 
     def accept_point(self, p, datacode):
@@ -29,12 +29,18 @@ class TestTotalCrossSection(unittest.TestCase):
             accepted = (p for p in points if self.accept_point(p, d))
             chi2_, npoints_ = 0, 0
             for p in accepted:
-                chi2_ += ( (p.observable - self.model(p.energy ** 2, p.t, d, self.parameters)) / p.error ) ** 2
+                y = self.model(p.energy ** 2, p.t, d, self.parameters)
+
+                chi2__ = ((p.observable - y)/ p.error) ** 2
+                # print p.energy, p.observable, y, p.error,  chi2__
+
+                chi2_ +=  chi2__
+                # print p.energy, p.t,  chi2__, d
                 npoints_ += 1
             chi2 += chi2_
             npoints += npoints_
 
-            print 'Chi^2\t{0} chi^2/ndf \t{3} for \t{1} \tpoints, per process {2}'.format(chi2, npoints, d, chi2 / npoints)
+            print 'Chi^2\t{0} chi^2/ndf \t{3} for \t{1} \tpoints, per process {2}'.format(chi2_, npoints_, d, chi2_ / npoints_)
 
 
         print

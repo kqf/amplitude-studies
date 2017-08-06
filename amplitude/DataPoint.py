@@ -23,6 +23,8 @@ class DataPoint(object):
            5 -- error
            6 -- id of the observable
         """
+        dataf = lambda x: x[0:2] + x[3:5] if infile == 'dsdtout.dat' else x[0:4]
+
         raw_data = []
         with open(infile,'r') as file:
             for line in file:
@@ -33,7 +35,7 @@ class DataPoint(object):
                 if dataset_in_file != dataset:
                     continue
 
-                energy, t, observable, error = map(float, data[0:4])
+                energy, t, observable, error = map(float, dataf(data))
 
                 raw_data.append( DataPoint(energy, t,
                     observable, error, dataset) )
