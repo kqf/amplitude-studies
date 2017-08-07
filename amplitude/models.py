@@ -52,7 +52,8 @@ class AnalyticAmplitude(Amplitude):
 
     @staticmethod
     def h_amplitude(poles, s, x):
-        return sum(pole.h_(s, x) for pole in poles)
+        # print 'len', poles
+        return sum(pole.h_(s, x) for i, pole in enumerate(poles))
 
 
 class TripleExponentAmplitude(Amplitude):
@@ -145,13 +146,14 @@ class Model(object):
 
 
     def cross_section(self, s, t = 0):
-        flux = sqrt((s - 4 * self.m_p ** 2) * s)
-        sigma_tot = (self.k / flux) * self.A_amplitude(s, t)
+        # flux = sqrt((s - 4 * self.m_p ** 2) * s)
+        sigma_tot = (self.k / s) * self.A_amplitude(s, t)
         return sigma_tot
+
 
     def diff_cross_section(self, s, t = 0):
         A = self.A_amplitude(s, t, False)
-        res = abs(A) ** 2 / 64 / pi / s ** 2
+        res = abs(A) ** 2 * self.k / 16./ pi / s  ** 2
         return res
 
 
