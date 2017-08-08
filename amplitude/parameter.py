@@ -11,7 +11,8 @@ class Parameter(object):
 
     @staticmethod
     def read_parameters(infile):
-        with open(infile) as f:
+        # Store all the data in one folder, fore this behaviour
+        with open('input-data/' + infile) as f:
             data = map(Parameter, f)
         return data
 

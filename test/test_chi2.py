@@ -4,15 +4,15 @@ import ROOT
 import json
 import unittest
 from amplitude.DataPoint import DataPoint
-from amplitude.models import Model
+from amplitude.models import Eikonal
 from amplitude.parameter import Parameter
 
 
-class TestTotalCrossSection(unittest.TestCase):
+class TestChi2(unittest.TestCase):
 
 
     def setUp(self):
-        self.model, self.parameters = Model('triples'), Parameter.parameters()
+        self.model, self.parameters = Eikonal('triples'), Parameter.parameters()
         self.data = DataPoint.read_data('dsdtout.dat')
 
 

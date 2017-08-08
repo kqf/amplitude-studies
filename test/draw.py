@@ -4,7 +4,7 @@ import ROOT
 import unittest
 from amplitude.DataPoint import DataPoint
 from amplitude.parameter import Parameter
-from amplitude.models import Model
+from amplitude.models import Eikonal
 
 
 class Draw(unittest.TestCase):
@@ -16,7 +16,7 @@ class Draw(unittest.TestCase):
         self.filename = 'alldata_v1_4.dat'
         self.names = {d: n for n, d in zip(names, datasets)}
         self.data = DataPoint.read_data(self.filename, datasets)
-        self.model = Model('triples')
+        self.model = Eikonal('triples')
 
 
     def approximation(self, code, energy = 19.4):

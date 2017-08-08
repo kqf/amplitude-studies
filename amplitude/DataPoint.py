@@ -23,10 +23,10 @@ class DataPoint(object):
            5 -- error
            6 -- id of the observable
         """
-        dataf = lambda x: x[0:2] + x[3:5] if infile == 'dsdtout.dat' else x[0:4]
+        dataf = lambda x: x[0:2] + x[3:5] if 'dsdtout.dat' in infile else x[0:4]
 
         raw_data = []
-        with open(infile,'r') as file:
+        with open('input-data/' + infile,'r') as file:
             for line in file:
                 data = line.lower().split()
 

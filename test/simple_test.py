@@ -4,7 +4,7 @@ import ROOT
 import json
 import unittest
 from amplitude.DataPoint import DataPoint
-from amplitude.models import Model
+from amplitude.models import Eikonal
 from amplitude.parameter import Parameter 
 import numpy as np
 from scipy import integrate
@@ -26,7 +26,7 @@ class TestSimple(unittest.TestCase):
 
     def testPole(self):
         s, t = 5.009600000000000, 0
-        model = Model('triples')
+        model = Eikonal('triples')
         nominal = complex(-55.09380315038144, 934.4414471233758)
 
         model.set_parameters(self.cscode, self.parameters)
