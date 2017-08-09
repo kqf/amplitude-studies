@@ -3,7 +3,7 @@
 import ROOT
 import json
 import unittest
-from amplitude.DataPoint import DataPoint
+from amplitude.datapoint import DataPoint
 from amplitude.models import Eikonal
 from amplitude.parameter import Parameter
 

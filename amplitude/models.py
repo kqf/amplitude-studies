@@ -20,9 +20,12 @@ class Eikonal(object):
                              310: self.diff_cross_section, 311: self.diff_cross_section
                            }
 
+    def set_parameters(self, code, par):
+        self.llambda = self.amplitude.set_parameters(code, par)
+
     def __call__(self, s, t, code, par):
         function = self.observables.get(code)
-        self.llambda = self.amplitude.set_parameters(code, par)
+        self.set_parameters(code, par)
         return function(s, t)
 
     def H_amplitude(self, s, x):
