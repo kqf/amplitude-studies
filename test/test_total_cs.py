@@ -24,7 +24,6 @@ class TestTotalCrossSection(unittest.TestCase):
     def checkModel(self, name, data):
         model = Eikonal(name)
         actual = [model(ss ** 2, t, self.cscode, self.parameters) for ss, t in data]
-        print actual
         for a, b, energy in zip(self.conf[name], actual, data):
             mymsg = 'At energy {0} GeV, the values differ, nominal: {1}, actual {2}'.format(energy, a, b)
             self.assertAlmostEqual(a, b, msg=mymsg)

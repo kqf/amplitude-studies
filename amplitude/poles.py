@@ -28,14 +28,14 @@ class PoleNumeric(object):
     def a_amplitude(poles, s, t):
         return sum(p.partial_amplitude(s, t) for p in poles)
 
-    @staticmethod
-    def h_amplitude(poles, s, x):
-        f_real = lambda q: PoleNumeric.a_amplitude(poles, s, q*q).real * q * sf.j0(q * x)
-        h_real = (1. / (8 * pi * s) ) * integrate.quad(f_real, 0, numpy.inf)[0]
+    @classmethod
+    def h_amplitude(klass, poles, s, x):
+        f_real = lambda q: klass.a_amplitude(poles, s, q * q).real * q * sf.j0(q * x)
+        h_real = integrate.quad(f_real, 0, numpy.inf)[0]
 
-        f_imag = lambda q: PoleNumeric.a_amplitude(poles, s, q*q).imag * q * sf.j0(q * x)
-        h_imag = (1. / (8 * pi * s) ) * integrate.quad(f_imag, 0, numpy.inf)[0]
-        return complex(h_real, h_imag)
+        f_imag = lambda q: klass.a_amplitude(poles, s, q * q).imag * q * sf.j0(q * x)
+        h_imag = integrate.quad(f_imag, 0, numpy.inf)[0]
+        return complex(h_real, h_imag) / (8 * pi * s)
 
 
 class Pole(PoleNumeric):
@@ -59,22 +59,25 @@ class TripleExponentPole(PoleNumeric):
         super(TripleExponentPole, self).__init__()
 
     def setup(self, par, i, process):
-        delp1, self.alp1p, g, self.betap1, self.betap2, self.betap3, self.cp11, self.cp12, odd = par[i: i + self.npars]
+        delp1, self.alp1p, g, betap1, betap2, betap3, cp11, cp12, odd = par[i: i + self.npars]
+        cp13 = g 
+
+        self.cp = cp11, cp12, cp13
+        self.beta = betap1, betap2, betap3
+
         self.alp1 = par[9] - delp1 if i != 9 else delp1
-        self.cp13 = g 
         self.coef = self.getcoef(process, odd)
         return self.npars
+
+    def cpsum(self, x, rr):
+        return sum(cp * exp(-0.25 * x **2 / r) * (0.5 / r) for cp, r in zip(self.cp, rr))
 
     def h_(self, s, x):
         ss = -1j * s
         alphalog = log(ss) * self.alp1p
 
-        f = lambda r: r + alphalog 
-        r1, r2, r3 = map(f, (self.betap1, self.betap2, self.betap3))
-
-        fbp1 =(self.cp11 * exp(-0.25 * x **2 / r1) * (0.5 / r1) + 
-               self.cp12 * exp(-0.25 * x **2 / r2) * (0.5 / r2) + 
-               self.cp13 * exp(-0.25 * x **2 / r3) * (0.5 / r3))
+        rr = map(lambda r: r + alphalog, self.beta)
+        fbp1 = self.cpsum(x, rr)
 
         res = fbp1 * ss ** self.alp1 * self.coef
         return res / (8 * pi * s)

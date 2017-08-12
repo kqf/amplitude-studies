@@ -15,37 +15,31 @@ class DataPoint(object):
         return 'Process %d, energy %f\n' % (self.dtype, self.energy)
 
     @staticmethod
-    def read_dataset(infile, dataset):
-        """Reading data from alldata_v1_4.dat file
-           0 -- \sqrt(s)
-           1 -- -t         
-           2 -- observable 
-           5 -- error
-           6 -- id of the observable
-        """
-        dataf = lambda x: x[0:2] + x[3:5] if 'dsdtout.dat' in infile else x[0:4]
+    def _extract_fields(string, filename, required):
+        dataset = int(string[6])
 
-        raw_data = []
-        with open('input-data/' + infile,'r') as file:
-            for line in file:
-                data = line.lower().split()
+        if dataset != required:
+            return None
 
-                dataset_in_file = int( float(data[6]))
+        if not 'dsdtout.dat' in filename:
+            return map(float, string[0:4]) + [dataset]
 
-                if dataset_in_file != dataset:
-                    continue
+        return map(float, string[0:2] + string[3:5]) + [dataset]
 
-                energy, t, observable, error = map(float, dataf(data))
+    @classmethod
+    def read_dataset(klass, infile, dataset):
+        f = lambda x: klass._extract_fields(x, infile, dataset)
 
-                raw_data.append( DataPoint(energy, t,
-                    observable, error, dataset) )
+        with open('input-data/' + infile, 'r') as ifile:
+            fields = [f(line.split()) for line in ifile]
 
-        return raw_data
+        datapoints = [klass(*i) for i in fields if i]
+        return datapoints
 
-    @staticmethod
-    def read_data(infile, datasets = [110, 111, 210, 211, 310, 311]):
-        raw_data = {d: DataPoint.read_dataset(infile, d) for d in datasets}
-        return raw_data
+    @classmethod
+    def read_data(klass, infile, datasets = [110, 111, 210, 211, 310, 311]):
+        data = {d: klass.read_dataset(infile, d) for d in datasets}
+        return data
 
 
 
