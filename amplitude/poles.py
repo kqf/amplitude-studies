@@ -52,6 +52,32 @@ class Pole(PoleNumeric):
         return sum(poleNumeric.h_(s, x) for poleNumeric in poles)
 
 
+class NonlinearPole(poleNumeric):
+    npars = 1
+    def __init__(self):
+        super(NonlinearPole, self).__init__()
+
+    def setup(self, par, i, process):
+        # TODO: Check parameter order
+        self.be1, self.be2, self.g1, self.g2, self.g3, \
+            self.x01, self.x02, self.amu, self.z odd = par[i: i + self.npars]
+
+        self.cp = cp11, cp12, cp13
+        self.beta = betap1, betap2, betap3
+
+        self.alp1 = par[9] - delp1 if i != 9 else delp1
+        self.coef = self.getcoef(process, odd)
+        return self.npars
+
+        
+    def partial_amplitude(self, s, t):
+        first = (self.g1 * exp(-self.be1 * self.z) + \
+                 self.g2 * exp(-self.be2 * (dsqrt(self.z**2 + self.x02**2)-self.x02)) 
+        second = self.g3 * (1. + 1. / (1. + self.z/self.x03) ** self.amu)**2
+        return first + second
+        
+
+
 class TripleExponentPole(PoleNumeric):
     npars = 9
 
