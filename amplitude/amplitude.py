@@ -1,5 +1,6 @@
 
 from poles import Pole, PoleNumeric, TripleExponentPole
+import poles
 
 class NumericAmplitude(object):
     def __init__(self):
@@ -30,4 +31,11 @@ class TripleExponentAmplitude(NumericAmplitude):
         super(TripleExponentAmplitude, self).__init__()
         self.poles = TripleExponentPole(), TripleExponentPole(), TripleExponentPole(), Pole(), Pole()
         self.type = Pole
+
+class NonlinearAmplitude(NumericAmplitude):
+    def __init__(self):
+        super(NonlinearAmplitude, self).__init__()
+        self.poles = poles.FirstPomeron(), poles.SecondPomeron(), poles.Odderon(), PoleNumeric(), PoleNumeric()
+        self.type = PoleNumeric
+        
 

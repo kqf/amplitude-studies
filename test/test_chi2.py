@@ -11,9 +11,16 @@ from amplitude.parameter import Parameter
 class TestChi2(unittest.TestCase):
 
 
-    def setUp(self):
-        self.model, self.parameters = Eikonal('triples'), Parameter.parameters()
-        self.data = DataPoint.read_data('dsdtout.dat')
+    def test_linear_model(self):
+        model, parameters = Eikonal('triples'), Parameter.parameters()
+        data = DataPoint.read_data('dsdtout.dat')
+        self.run_chi2(model, parameters, data)
+
+    def test_nonlinear_model(self):
+        model, parameters = Eikonal('nmod'), Parameter.parameters()
+        data = DataPoint.read_data('dsdtout.dat')
+        self.run_chi2(model, parameters, data)
+
 
 
     def accept_point(self, p, datacode):
@@ -23,13 +30,13 @@ class TestChi2(unittest.TestCase):
         return 19.0 < p.energy and p.energy < 8000.0 and 0.010 < p.t and p.t < 15.000
 
 
-    def testChi2(self):
+    def run_chi2(self, model, parameters, data):
         chi2, npoints = 0, 0
-        for d, points in self.data.iteritems():
+        for d, points in data.iteritems():
             accepted = (p for p in points if self.accept_point(p, d))
             chi2_, npoints_ = 0, 0
             for p in accepted:
-                y = self.model(p.energy ** 2, p.t, d, self.parameters)
+                y = model(p.energy ** 2, p.t, d, parameters)
 
                 chi2__ = ((p.observable - y)/ p.error) ** 2
                 # print p.energy, p.observable, y, p.error,  chi2__

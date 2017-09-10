@@ -1,13 +1,19 @@
 #!/usr/bin/python2.7 
 
-from amplitude import AnalyticAmplitude, NumericAmplitude, TripleExponentAmplitude
+from amplitude import AnalyticAmplitude, NumericAmplitude, TripleExponentAmplitude, NonlinearAmplitude
 
 from cmath import exp, pi
 from scipy import integrate
 import scipy.special as sf
 
 class Eikonal(object):
-    ampl_types = {'analytic': AnalyticAmplitude, 'numeric': NumericAmplitude, 'triples': TripleExponentAmplitude}
+    ampl_types = {
+                    'analytic': AnalyticAmplitude, 
+                    'numeric': NumericAmplitude, 
+                    'triples': TripleExponentAmplitude,
+                    'nmod':    NonlinearAmplitude
+                }
+
     k, m_p =  0.3893797, 0.9382700
 
     def __init__(self, mtype = 'analytic'):
