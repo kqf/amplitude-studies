@@ -85,8 +85,7 @@ class TripleExponentPole(PoleNumeric):
         super(TripleExponentPole, self).__init__()
 
     def setup(self, par, i, process):
-        delp1, self.alp1p, g, betap1, betap2, betap3, cp11, cp12, odd = par[i: i + self.npars]
-        cp13 = g 
+        delp1, self.alp1p, betap1, betap2, betap3, cp11, cp12, cp13, odd = par[i: i + self.npars]
 
         self.cp = cp11, cp12, cp13
         self.beta = betap1, betap2, betap3
@@ -110,25 +109,25 @@ class TripleExponentPole(PoleNumeric):
 
 
 class FirstPomeron(PoleNumeric):
-    npars = 9
+    npars = 10 
     def __init__(self):
         super(PoleNumeric, self).__init__()
 
 
     def setup(self, par, i, process = 110):
-        delp1, self.alp1p,\
-            self.gp11, self.gp12, self.gp13, \
-            self.betap11, self.betap12, self.betap13, \
-            odd   = par[i:i + self.npars]
+        delp1, self.alp1p, self.t0p, \
+            self.g1, self.g2, self.g3, \
+            self.beta1, self.beta2, amu, \
+            odd = par[i:i + self.npars]
 
-        self.alpha = par[9] - delp1 if i != 9 else par[9]
+        self.alpha = par[10] - delp1 if i != 10 else par[10]
         self.coef = self.getcoef(process, odd)
         return self.npars
 
     def f(self, t):
-        res = self.gp11 * exp(- self.betap11 * t) + \
-              self.gp12 * exp(- self.betap12 * t) + \
-              self.gp13 * (1 + t / self.betap13) ** 4
+        res = self.g1 * exp(- self.beta1 * t) + \
+              self.g2 * exp(- self.beta2 * t) + \
+              self.g3 * (1 + t / self.t0p) ** 4
         return res ** 2
 
 
@@ -137,24 +136,24 @@ class FirstPomeron(PoleNumeric):
 
 
 class SecondPomeron(FirstPomeron):
-    npars = 10
+    npars = 11
     def __init__(self):
         super(PoleNumeric, self).__init__()
 
 
     def setup(self, par, i, process = 110):
         self.alpha, self.alp2p, self.t0p, \
-            self.gp21, self.gp22, self.gp23,\
-            self.betap21, self.betap22, self.betap23,\
+            self.gp21, self.gp22, self.gp23, \
+            self.betap21, self.betap22, self.tp2, mu, \
             odd = par[i:i + self.npars]
 
         self.coef = self.getcoef(process, odd)
         return self.npars
 
     def f(self, t):
-        res = self.gp11 * exp(- self.betap11 * t) + \
-              self.gp12 * exp(- self.betap12 * (t ** 2 - self.t0p ** 2) ** 0.5) + \
-              self.gp13 * (1 + t / self.betap13) ** 4
+        res = self.gp21 * exp(- self.betap21 * t) + \
+              self.gp22 * exp(- self.betap22 * (t ** 2 + self.tp2 ** 2) ** 0.5 - self.tp2) + \
+              self.gp23 * (1 + t / self.t0p) ** 4
         return res ** 2
 
 
@@ -163,26 +162,26 @@ class SecondPomeron(FirstPomeron):
 
 
 class Odderon(FirstPomeron):
-    npars = 11
+    npars = 12
     def __init__(self):
         super(PoleNumeric, self).__init__()
 
 
     def setup(self, par, i, process = 110):
-        delo1, self.alp2p, self.t0p, self.t1p,\
-            self.gp21, self.gp22, self.gp23,\
-            self.betap21, self.betap22, self.betap23,\
+        delo1, self.alp2p, self.t0p,\
+            self.gp1, self.gp2, self.gp3,\
+            self.betap1, self.betap2, self.tp2, self.to2, mu, \
             odd = par[i:i + self.npars]
 
-
-        self.alpha = par[9] - delo1 if i != 9 else par[9]
+        self.alpha = par[10] - delo1 if i != 10 else par[10]
         self.coef = self.getcoef(process, odd)
         return self.npars
 
+
     def f(self, t):
-        res = self.gp11 * exp(- self.betap11 * t) + \
-              self.gp12 * exp(- self.betap12 * (t ** 2 - self.t0p ** 2) ** 0.5) + \
-              self.gp13 * (1 + t / self.betap13) ** 4
+        res = self.gp1 * exp(- self.betap1 * (t ** 2 + self.to2 ** 2) ** 0.5 - self.to2) + \
+              self.gp2 * exp(- self.betap2 * (t ** 2 + self.tp2 ** 2) ** 0.5 - self.tp2) + \
+              self.gp3 * (1 + t / self.t0p) ** 4
         return res ** 2
 
 
