@@ -43,13 +43,46 @@ class Pole(PoleNumeric):
         super(Pole, self).__init__()
 
     def h_(self, s, x):
-        cdllp = log(-1j * s)
-        rf2 = self.B + self.alpha * cdllp 
-        return self.g * exp(self.alpha0 * cdllp) * (0.5 / rf2) * exp(-0.25 * x ** 2 / rf2) / (8 * pi * s)
+        ss = -1j * s
+        rf2 = self.B + self.alpha * log(ss)
+        return self.g * ss ** self.alpha0 * (0.5 / rf2) * exp(-0.25 * x ** 2 / rf2) / (8 * pi * s)
 
     @staticmethod
     def h_amplitude(poles, s, x):
         return sum(poleNumeric.h_(s, x) for poleNumeric in poles)
+
+
+class TripleExponentPole(Pole):
+    npars = 9
+
+    def __init__(self):
+        super(TripleExponentPole, self).__init__()
+
+    def setup(self, par, i, process):
+        delp1, self.alphap, betap1, betap2, betap3, cp11, cp12, cp13, odd = par[i: i + self.npars]
+
+        self.cp = cp11, cp12, cp13
+        self.beta = betap1, betap2, betap3
+        # TODO: Since this was the bug, try to fix this in next datasets
+        #
+        self.cp, self.beta = self.beta, self.cp
+
+        self.alpha0 = par[9] - delp1 if i != 9 else delp1
+        self.coef = self.getcoef(process, odd)
+        return self.npars
+
+    def cpsum(self, x, rr):
+        return sum(cp * (0.5 / r) * exp(-0.25 * x ** 2 / r) for cp, r in zip(self.cp, rr)) 
+
+    def h_(self, s, x):
+        ss = -1j * s
+        rr = map(lambda r: r + log(ss) * self.alphap, self.beta)
+        fbp1 = self.cpsum(x, rr)
+
+        res = fbp1 * ss ** self.alpha0 * self.coef
+        return  res / (8 * pi * s)
+
+
 
 
 class NonlinearPole(PoleNumeric):
@@ -76,38 +109,6 @@ class NonlinearPole(PoleNumeric):
         second = self.g3 * (1. + 1. / (1. + self.z/self.x03) ** self.amu)**2
         return first + second
         
-
-
-class TripleExponentPole(PoleNumeric):
-    npars = 9
-
-    def __init__(self):
-        super(TripleExponentPole, self).__init__()
-
-    def setup(self, par, i, process):
-        delp1, self.alp1p, betap1, betap2, betap3, cp11, cp12, cp13, odd = par[i: i + self.npars]
-
-        self.cp = cp11, cp12, cp13
-        self.beta = betap1, betap2, betap3
-
-        self.alp1 = par[9] - delp1 if i != 9 else delp1
-        self.coef = self.getcoef(process, odd)
-        return self.npars
-
-    def cpsum(self, x, rr):
-        return sum(cp * exp(-0.25 * x **2 / r) * (0.5 / r) for cp, r in zip(self.cp, rr))
-
-    def h_(self, s, x):
-        ss = -1j * s
-        alphalog = log(ss) * self.alp1p
-
-        rr = map(lambda r: r + alphalog, self.beta)
-        fbp1 = self.cpsum(x, rr)
-
-        res = fbp1 * ss ** self.alp1 * self.coef
-        return res / (8 * pi * s)
-
-
 class FirstPomeron(PoleNumeric):
     npars = 10 
     def __init__(self):
@@ -115,7 +116,7 @@ class FirstPomeron(PoleNumeric):
 
 
     def setup(self, par, i, process = 110):
-        delp1, self.alp1p, self.t0p, \
+        delp1, self.alphap, self.t0p, \
             self.g1, self.g2, self.g3, \
             self.beta1, self.beta2, amu, \
             odd = par[i:i + self.npars]
@@ -132,7 +133,7 @@ class FirstPomeron(PoleNumeric):
 
 
     def partial_amplitude(self, s, t):
-        return self.coef * (-1j*s) ** (self.alpha - self.alp1p * t) * self.f(t)
+        return self.coef * (-1j*s) ** (self.alpha - self.alphap * t) * self.f(t)
 
 
 class SecondPomeron(FirstPomeron):

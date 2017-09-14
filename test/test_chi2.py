@@ -11,12 +11,12 @@ from amplitude.parameter import Parameter
 class TestChi2(unittest.TestCase):
 
 
-    @unittest.skip('check the parameters')
     def test_linear_model(self):
         model, parameters = Eikonal('triples'), Parameter.parameters('triple_exp_parameters.dat')
         data = DataPoint.read_data('dsdtout.dat')
         self.run_chi2(model, parameters, data)
 
+    @unittest.skip('check the parameters')
     def test_nonlinear_model(self):
         model, parameters = Eikonal('nmod'), Parameter.parameters('nonlin_parameters.dat')
         data = DataPoint.read_data('dsdtout.dat')

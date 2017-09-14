@@ -20,7 +20,7 @@ class Draw(unittest.TestCase):
 
 
     def approximation(self, code, energy = 19.4):
-        par = Parameter.parameters('new_parameters.dat')
+        par = Parameter.parameters('triple_exp_parameters.dat')
         if code // 300 == 0:
             f = lambda x, p: self.model(x[0] ** 2, 0, code, p)
             func = ROOT.TF1('func', f, 5, 1e5, len(par)) 
