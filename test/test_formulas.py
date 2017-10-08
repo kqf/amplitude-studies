@@ -64,6 +64,57 @@ def testTriplePoleFormula(s):
         return complex(real, imag) * (8 * pi * s)
 
 
+def testTriplePoleFormulaNew(s):
+        def H(x):
+            delp1  = 0.53465E-01 
+            alp1p  = 0.37310E+00 
+
+            gp11  = 0.91325E+01 
+            gp12  = 0.57979E+01 
+            gp13  = 0.25445E+02 
+
+            betap11  = 0.10001E+00 
+            betap12  = 0.13518E+02 
+            betap13  = 0.25251E+01 
+
+            # Genral constants
+            alp2    = 0.11581E+01 
+            alambda =  0.100000E+01
+
+            alp1 =  alp2 - delp1
+
+            aim = 1j 
+            cdllp = cdlog(- aim * s)
+
+            r1pom11 = betap11 + alp1p * cdllp 
+            r1pom22 = betap12 + alp1p * cdllp 
+            r1pom33 = betap13 + alp1p * cdllp 
+
+            fbp1 = ( gp11 * cdexp(-0.25 * x ** 2 / r1pom11) * (0.5 / r1pom11) + 
+                     gp12 * cdexp(-0.25 * x ** 2 / r1pom22) * (0.5 / r1pom22) + 
+                     gp13 * cdexp(-0.25 * x ** 2 / r1pom33) * (0.5 / r1pom33) )
+
+            h = -fbp1*(-aim*s) ** alp1 / (8. * pi * s)
+
+
+            L = 2j * alambda
+            H = (exp(L * h) - 1) / L
+            print 'H: {0} h: {1} \t s: {2} \t b: {3} fbp1 {4}'.format(H, h, s, x, fbp1,)
+            return H
+
+        b = 0.1
+        print H(b)
+
+        # f = lambda b: H(b).imag * b
+        # imag =  integrate.quad(f, 0, 40)[0]  # integral  zero to lower 
+
+        # f = lambda b: H(b).real * b
+        # real =  integrate.quad(f, 0, 40)[0]  # integral  zero to lower 
+        return 0 
+        # return complex(real, imag) * (8 * pi * s)
+
+
+
 def testRegularPoleFormula(s):
         def H(x):
             alf     = 0.690000E+00 
@@ -108,6 +159,7 @@ class TestSimple(unittest.TestCase):
             self.conf = json.load(f)
 
 
+    @unittest.skip('')
     def testPole(self):
         s, t = 5.009600000000000, 0
         model = Eikonal('triples')
@@ -118,6 +170,7 @@ class TestSimple(unittest.TestCase):
         print 'Total amplitude: Nominal {0} and actual {1}'.format(nominal, value)
 
 
+    @unittest.skip('')
     def testPaperFormulaForTripleExponent(self):
         # Check the formula as it was given by the author
         #
@@ -128,6 +181,7 @@ class TestSimple(unittest.TestCase):
         print 'Triple pole: Nominal {0} and actual {1}'.format(nominal, value)
 
 
+    @unittest.skip('')
     def testPaperFormulaForRegularResidue(self):
         # Check the formula as it was given by the author
         #
@@ -137,4 +191,9 @@ class TestSimple(unittest.TestCase):
 
         value = testRegularPoleFormula(s ** 2)
         print 'Regular pole:  Nominal {0} and actual {1}'.format(nominal, value)
+
+
+    def test_new_parameters(self):
+        sqrts = 0.194180E+02
+        testTriplePoleFormulaNew(sqrts ** 2)
 
