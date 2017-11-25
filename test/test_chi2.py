@@ -16,12 +16,6 @@ class TestChi2(unittest.TestCase):
         data = DataPoint.read_data('dsdtout.dat')
         self.run_chi2(model, parameters, data)
 
-    @unittest.skip('check the parameters')
-    def test_nonlinear_model(self):
-        model, parameters = Eikonal('nmod'), Parameter.parameters('nonlin_parameters.dat')
-        data = DataPoint.read_data('dsdtout.dat')
-        self.run_chi2(model, parameters, data)
-
     def accept_point(self, p, datacode):
         
         if datacode // 300 == 0:

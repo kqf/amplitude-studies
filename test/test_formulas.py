@@ -64,23 +64,53 @@ def testTriplePoleFormula(s):
         return complex(real, imag) * (8 * pi * s)
 
 
+def dump_to_file(h, filename = 'm.second.pomeron.dat'):
+        b = np.arange(0, 5., 0.1)
+        data = [h(ib)[1] for ib in b]
+        real, imag = np.array([i.real for i in data]), np.array([i.imag for i in data])
+        np.savetxt('test/m.' + filename + '.dat', np.asarray([b, real, imag]).T)
+
+
 def testTriplePoleFormulaNew(s):
-        def H(x):
-            delp1  = 0.53465E-01 
-            alp1p  = 0.37310E+00 
-
-            gp11  = 0.91325E+01 
-            gp12  = 0.57979E+01 
-            gp13  = 0.25445E+02 
-
-            betap11  = 0.10001E+00 
-            betap12  = 0.13518E+02 
-            betap13  = 0.25251E+01 
-
+        def h(x, verbose = False):
             # Genral constants
             alp2    = 0.11581E+01 
             alambda =  0.100000E+01
 
+            # # First Pomeron
+            # delp1  = 0.53465E-01 
+            # alp1p  = 0.37310E+00 
+
+            # gp11  = 0.91325E+01 
+            # gp12  = 0.57979E+01 
+            # gp13  = 0.25445E+02 
+
+            # betap11  = 0.10001E+00 
+            # betap12  = 0.13518E+02 
+            # betap13  = 0.25251E+01 
+            # alp1 =  alp2 - delp1
+
+            # Second Pomeron
+            # alp1 = 0.11581E+01  
+
+            # alp1p = 0.82485E-01  
+            # gp11 = 0.40327E+01  
+            # gp12 = 0.19212E+00  
+            # gp13 = 0.48001E+01  
+
+            # betap11 = 0.10499E+01  
+            # betap12 = 0.10000E+00  
+            # betap13 = 0.40484E+01  
+
+            # Odderon
+            delp1 = 0.42180E-01  
+            alp1p = 0.55991E-01  
+            gp11 = 0.10738E+00  
+            gp12 = 0.13869E+01  
+            gp13 = 0.47682E-05  
+            betap11 = 0.10001E+00  
+            betap12 = 0.41992E+01  
+            betap13 = 0.89147E+01  
             alp1 =  alp2 - delp1
 
             aim = 1j 
@@ -99,24 +129,27 @@ def testTriplePoleFormulaNew(s):
 
             L = 2j * alambda
             H = (exp(L * h) - 1) / L
-            print 'H: {0} h: {1} \t s: {2} \t b: {3} fbp1 {4}'.format(H, h, s, x, fbp1,)
-            return H
+            if verbose:
+                print
+                print 'H: {0}\nh: {1} \t s: {2} \t b: {3} fbp1 {4}'.format(H, h, s, x, fbp1,)
+            return H, h
 
-        b = 0.1
-        print H(b)
+        dump_to_file(h, 'odderon')
+        H = lambda b: h(b)[0]
 
-        # f = lambda b: H(b).imag * b
-        # imag =  integrate.quad(f, 0, 40)[0]  # integral  zero to lower 
+        f = lambda b: H(b).imag * b
+        imag =  integrate.quad(f, 0, 40)[0]  # integral  zero to lower 
 
-        # f = lambda b: H(b).real * b
-        # real =  integrate.quad(f, 0, 40)[0]  # integral  zero to lower 
-        return 0 
-        # return complex(real, imag) * (8 * pi * s)
+        f = lambda b: H(b).real * b
+        real =  integrate.quad(f, 0, 40)[0]  # integral  zero to lower 
+        # return 0 
+        return complex(real, imag) * (8 * pi * s)
 
 
 
 def testRegularPoleFormula(s):
         def H(x):
+            # f reggeon
             alf     = 0.690000E+00 
             alfp    = 0.840000E+00
             gf      = 0.264894E+03 
@@ -132,11 +165,10 @@ def testRegularPoleFormula(s):
             L = 2j * alambda
             H = (exp(L * h) - 1) / L
             # print 'H: {0} h: {1} \t s: {2} \t b: {3}'.format(H, h, s, x)
-            return H
+            return H, h
 
-        # b = 0
-        # b = 0.125000E+02
-        # print H(b)
+        dump_to_file(h, 'omega')
+        H = lambda b: h(b)[0]
 
         f = lambda b: H(b).imag * b
         imag =  integrate.quad(f, 0, 40)[0]  # integral  zero to lower 
@@ -195,5 +227,14 @@ class TestSimple(unittest.TestCase):
 
     def test_new_parameters(self):
         sqrts = 0.194180E+02
-        testTriplePoleFormulaNew(sqrts ** 2)
+        model, parameters = Eikonal('triples'), Parameter.parameters('triple_exp_parameters.dat')
+        # NB: First set parameters and then delete poles
+        model.set_parameters(110, parameters)
+        model.amplitude.use_single_pole(0)
+        formula = testTriplePoleFormulaNew(sqrts ** 2)
+        
+        print 'Explicit formula: ', formula, ' model: ', model.A_amplitude(sqrts ** 2, 0, skipreal=False)
+
+        testRegularPoleFormula(sqrts ** 2)
+
 

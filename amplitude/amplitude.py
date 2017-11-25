@@ -2,6 +2,7 @@
 from poles import Pole, PoleNumeric, TripleExponentPole
 import poles
 
+
 class NumericAmplitude(object):
     def __init__(self):
         super(NumericAmplitude, self).__init__()
@@ -17,6 +18,13 @@ class NumericAmplitude(object):
             i += poleNumeric.setup(par, i, code)
         llambda = par[-1]
         return llambda
+
+    def use_single_pole(self, i):
+        self.poles = self.poles[i:i + 1]
+
+    def npars(self):
+        return sum(i.npars for i in self.poles)
+
 
 
 class AnalyticAmplitude(NumericAmplitude):

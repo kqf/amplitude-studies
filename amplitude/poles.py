@@ -6,6 +6,10 @@ from cmath import exp, log, pi
 import numpy
 import scipy.special as sf
 
+
+# TODO: Remove process from parameter setup. 
+# TODO: Don't set parameters at every point 
+
 class PoleNumeric(object):
     npars = 5
     def __init__(self):

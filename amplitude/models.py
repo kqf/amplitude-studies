@@ -36,6 +36,7 @@ class Eikonal(object):
 
     def H_amplitude(self, s, x):
         h = self.amplitude.h(s, x)
+        # print self.amplitude.h(s, 0)
         H = self.unitarize(h)
         return H
 
