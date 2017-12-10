@@ -9,13 +9,13 @@ class NumericAmplitude(object):
         self.poles = PoleNumeric(), PoleNumeric(), PoleNumeric()
         self.type = PoleNumeric
 
-    def h(self, s, x):
-        return self.type.h_amplitude(self.poles, s, x)
+    def h(self, s, x, code):
+        return self.type.h_amplitude(self.poles, s, x, code)
 
-    def set_parameters(self, code, par):
+    def set_parameters(self, par):
         i, par = 0, [p for p in par] # ROOT provides buffer, not array
         for poleNumeric in self.poles:
-            i += poleNumeric.setup(par, i, code)
+            i += poleNumeric.setup(par, i)
         llambda = par[-1]
         return llambda
 

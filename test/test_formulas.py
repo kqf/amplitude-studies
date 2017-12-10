@@ -148,7 +148,7 @@ def testTriplePoleFormulaNew(s):
 
 
 def testRegularPoleFormula(s):
-        def H(x):
+        def h(x):
             # f reggeon
             alf     = 0.690000E+00 
             alfp    = 0.840000E+00
@@ -197,8 +197,8 @@ class TestSimple(unittest.TestCase):
         model = Eikonal('triples')
         nominal = complex(-630.265349098, 2542.98388891)
 
-        model.set_parameters(self.cscode, self.parameters)
-        value = model.A_amplitude(s ** 2, t, False)
+        model.set_parameters(self.parameters)
+        value = model.A_amplitude(s ** 2, t, self.cscode, False)
         print 'Total amplitude: Nominal {0} and actual {1}'.format(nominal, value)
 
 
@@ -229,11 +229,11 @@ class TestSimple(unittest.TestCase):
         sqrts = 0.194180E+02
         model, parameters = Eikonal('triples'), Parameter.parameters('triple_exp_parameters.dat')
         # NB: First set parameters and then delete poles
-        model.set_parameters(110, parameters)
+        model.set_parameters(parameters)
         model.amplitude.use_single_pole(0)
         formula = testTriplePoleFormulaNew(sqrts ** 2)
         
-        print 'Explicit formula: ', formula, ' model: ', model.A_amplitude(sqrts ** 2, 0, skipreal=False)
+        print 'Explicit formula: ', formula, ' model: ', model.A_amplitude(sqrts ** 2, 0, 110, skipreal=False)
 
         testRegularPoleFormula(sqrts ** 2)
 
