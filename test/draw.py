@@ -11,27 +11,30 @@ class Draw(unittest.TestCase):
 
     def setUp(self):
         # datasets = [210] # [110, 111, 210, 211]#, 310, 311]
-        datasets =  [110, 111, 210, 211, 310, 311][::-1]
-        names = [ "#sigma_{pp}", "#sigma_{ p#bar{p} }", "#rho_{pp}", "#rho_{ p#bar{p} }", "d#sigma_{pp}/dt" , "d#sigma_{ p#bar{p} }/dt"]
+        datasets = [110, 111, 210, 211, 310, 311][::-1]
+        names = ["#sigma_{pp}", "#sigma_{ p#bar{p} }", "#rho_{pp}",
+                 "#rho_{ p#bar{p} }", "d#sigma_{pp}/dt",
+                 "d#sigma_{ p#bar{p} }/dt"]
         self.filename = 'alldata_v1_4.dat'
         self.names = {d: n for n, d in zip(names, datasets)}
         self.data = DataPoint.read_data(self.filename, datasets)
         self.model = Eikonal('triples')
 
-
-    def approximation(self, code, energy = 19.4):
+    def approximation(self, code, energy=19.4):
         par = Parameter.parameters('triple_exp_parameters.dat')
         if code // 300 == 0:
-            f = lambda x, p: self.model(x[0] ** 2, 0, code, p)
-            func = ROOT.TF1('func', f, 5, 1e5, len(par)) 
+            def f(x, p):
+                return self.model(x[0] ** 2, 0, code, p)
+            func = ROOT.TF1('func', f, 5, 1e5, len(par))
         else:
-            f = lambda x, p: self.model(energy ** 2, x[0], code, p)
+            def f(x, p):
+                return self.model(energy ** 2, x[0], code, p)
             func = ROOT.TF1('func', f, 0, 15, len(par))
 
-        for i, p in enumerate(par): 
+        for i, p in enumerate(par):
             func.SetParameter(i, p)
-        return func 
-        
+        return func
+
     def graph_vs_approx(self, datacode, data):
         """Creates TGraphErrors, with differential cross section data"""
         graph, name = ROOT.TGraphErrors(), self.names[datacode]
@@ -39,10 +42,10 @@ class Draw(unittest.TestCase):
         graph.SetTitle(name)
 
         for i, p in enumerate(data):
-            x =  p.t if (data[0].dtype // 300 == 1) else p.energy
+            x = p.t if (data[0].dtype // 300 == 1) else p.energy
             y = p.observable
             if data[0].dtype // 300 == 1:
-                if p.energy > 19.2 and p.energy < 19.4 :
+                if p.energy > 19.2 and p.energy < 19.4:
                     continue
                 # y *= p.energy
 
@@ -55,11 +58,10 @@ class Draw(unittest.TestCase):
         graph.SetMarkerColor(46)
         return graph, self.approximation(datacode)
 
-
     def testDraw(self):
         canvas = ROOT.TCanvas('canvas', 'Non-linear trajectories', 800, 600)
 
-        for code in sorted(self.data, reverse = True):
+        for code in sorted(self.data, reverse=True):
             data = self.data[code]
             graph, approx = self.graph_vs_approx(code, data)
             pad = canvas.cd()
@@ -69,7 +71,6 @@ class Draw(unittest.TestCase):
             canvas.Update()
             canvas.SaveAs(str(code) + '.pdf')
             raw_input('Press ENTER ...')
-
 
     def update_pad(self, pad, code):
         pad.SetLogy(code // 300 == 1)
