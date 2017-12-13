@@ -1,12 +1,13 @@
-#!/usr/bin/python
+import pytest
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn
+import seaborn  # noqa
 
 
-# TODO: rewrite as test
-#
-
+@pytest.mark.parameterize("filename, ofilename", [
+    ("first.pomeron.dat", "first"),
+    ("second.pomeron.dat", "second"),
+])
 def draw_differenence(filename, ofilename):
     e, b, re, im = np.loadtxt('test/' + filename).T
     bb, rre, iim = np.loadtxt('test/m.' + filename).T
@@ -19,12 +20,3 @@ def draw_differenence(filename, ofilename):
     plt.legend()
     plt.savefig(ofilename + '.png')
     plt.show()
-
-
-def main():
-    draw_differenence("first.pomeron.dat", "first")
-    draw_differenence("second.pomeron.dat", "second")
-
-
-if __name__ == '__main__':
-    main()

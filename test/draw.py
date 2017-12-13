@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import ROOT
 import unittest
 from amplitude.datapoint import DataPoint
