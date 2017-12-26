@@ -1,6 +1,5 @@
-#!/usr/bin/python2.7
-
 import operator
+
 
 class Parameter(object):
 
@@ -17,6 +16,6 @@ class Parameter(object):
         return data
 
     @staticmethod
-    def parameters(infile = 'new_parameters.dat'):
+    def parameters(infile='new_parameters.dat'):
         data = Parameter.read_parameters(infile)
         return map(operator.attrgetter('value'), data)
