@@ -1,49 +1,45 @@
-#!/usr/bin/python
-
-import ROOT
+import pytest
 import json
-import unittest
+import numpy as np
 from amplitude.datapoint import DataPoint
 from amplitude.models import Eikonal
 from amplitude.parameter import Parameter
 
 
-class TestTotalCrossSection(unittest.TestCase):
+@pytest.fixture(scope="module")
+def nominal():
+    with open('config/tot_cs_analytic.json') as f:
+        conf = json.load(f)
+    return conf
 
 
-    def setUp(self):
-        self.cscode =  110
-        self.parameters = Parameter.parameters('parameters.dat')
-        data = DataPoint.read_data('alldata_v1_4.dat', [self.cscode])
-        self.arguments = [(x.energy, x.t) for x in data[self.cscode]]
-
-        with open('config/tot_cs_analytic.json') as f:
-            self.conf = json.load(f)
+def data(cscode=110):
+    data = DataPoint.read_data('alldata_v1_4.dat', [cscode])
+    return [(x.energy, x.t) for x in data[cscode]]
 
 
-    def checkModel(self, name, data):
-        model = Eikonal(name)
-        actual = [model(ss ** 2, t, self.cscode, self.parameters) for ss, t in data]
-        for a, b, energy in zip(self.conf[name], actual, data):
-            mymsg = 'At energy {0} GeV, the values differ, nominal: {1}, actual {2}'.format(energy, a, b)
-            self.assertAlmostEqual(a, b, msg=mymsg)
+@pytest.fixture(scope="module")
+def parameters(infile="parameters.dat"):
+    return Parameter.parameters('parameters.dat')
 
 
-
-    def testAnalytic(self):
-        self.checkModel('analytic', self.arguments)
-
-
-    def testNumeric(self):
-        self.checkModel('numeric', self.arguments[0:10])
-
-
-    def testCompareBoth(self):
-        model1, model2 = map(Eikonal, ['analytic', 'numeric'])
-        for energy, t in self.arguments[0:10]:
-            a, b = model1(energy ** 2, t, self.cscode, self.parameters), model2(energy ** 2, t, self.cscode, self.parameters)
-            mymsg = 'At energy {0} GeV, the values differ, analytic: {1}, numeric {2}'.format(energy, a, b)
-            self.assertAlmostEqual(a, b, msg=mymsg)
+@pytest.mark.parametrize("name, indata", [
+    ('analytic', data()),
+    ('numeric', data()[0:10]),
+])
+def test_calculate_model(name, indata, parameters, nominal, cscode=110):
+    model = Eikonal(name)
+    actual = [model(ss ** 2, t, cscode, parameters)
+              for ss, t in indata]
+    for a, b, energy in zip(nominal[name], actual, indata):
+        msg = 'At energy {} GeV, the difference, nominal: {}, actual {}'
+        assert pytest.approx(a) == b, msg.format(energy, a, b)
 
 
-
+def test_models_are_consistent(parameters, cscode=110):
+    model1, model2 = map(Eikonal, ['analytic', 'numeric'])
+    for energy, t in data()[0:10]:
+        a = model1(energy ** 2, t, cscode, parameters),
+        b = model2(energy ** 2, t, cscode, parameters)
+        msg = 'At energy {} GeV, difference analytic: {}, numeric {}'
+        np.testing.assert_almost_equal(a, b, err_msg=msg.format(energy, a, b))
