@@ -1,4 +1,3 @@
-#!/usr/bin/python2
 
 class DataPoint(object):
     def __init__(self, energy, t, observable, error, dtype):
@@ -21,14 +20,15 @@ class DataPoint(object):
         if dataset != required:
             return None
 
-        if not 'dsdtout.dat' in filename:
+        if 'dsdtout.dat' not in filename:
             return map(float, string[0:4]) + [dataset]
 
         return map(float, string[0:2] + string[3:5]) + [dataset]
 
     @classmethod
     def read_dataset(klass, infile, dataset):
-        f = lambda x: klass._extract_fields(x, infile, dataset)
+        def f(x):
+            return klass._extract_fields(x, infile, dataset)
 
         with open('input-data/' + infile, 'r') as ifile:
             fields = [f(line.split()) for line in ifile]
@@ -37,9 +37,6 @@ class DataPoint(object):
         return datapoints
 
     @classmethod
-    def read_data(klass, infile, datasets = [110, 111, 210, 211, 310, 311]):
+    def read_data(klass, infile, datasets=[110, 111, 210, 211, 310, 311]):
         data = {d: klass.read_dataset(infile, d) for d in datasets}
         return data
-
-
-
