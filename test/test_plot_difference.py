@@ -1,14 +1,15 @@
 import pytest
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn  # noqa
 
 
+@pytest.mark.onlylocal
 @pytest.mark.parameterize("filename, ofilename", [
     ("first.pomeron.dat", "first"),
     ("second.pomeron.dat", "second"),
 ])
 def draw_differenence(filename, ofilename):
+    import seaborn  # noqa
+    import matplotlib.pyplot as plt
     e, b, re, im = np.loadtxt('test/' + filename).T
     bb, rre, iim = np.loadtxt('test/m.' + filename).T
 

@@ -1,3 +1,4 @@
+import pytest
 from amplitude.datapoint import DataPoint
 from amplitude.models import Eikonal
 from amplitude.parameter import Parameter
@@ -6,6 +7,7 @@ from amplitude.parameter import Parameter
 # NB: Use this test to debug, and print intermediate results
 
 
+@pytest.mark.onlylocal
 def test_model_debug():
     model, parameters = Eikonal('triples'), Parameter.parameters(
         'triple_exp_parameters.dat')

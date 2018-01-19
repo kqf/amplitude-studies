@@ -8,3 +8,4 @@ alldata_v1_4.dat
 *.sublime-project
 *.sublime-workspace
 *.sortie
+.python-version

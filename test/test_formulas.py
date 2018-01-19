@@ -1,4 +1,4 @@
-import unittest
+import pytest
 from amplitude.models import Eikonal
 from amplitude.parameter import Parameter
 
@@ -180,7 +180,7 @@ def checkRegularPoleFormula(s):
 
 #  NB: Don't use assertions here, as this code and values will change
 #
-@unittest.skip('')
+@pytest.mark.skip('')
 def test_calculates_single_pole(cscode=110):
     s, t = 5.009600000000000, 0
     model = Eikonal('triples')
@@ -191,7 +191,7 @@ def test_calculates_single_pole(cscode=110):
     print 'Total amplitude: Nominal {0} and actual {1}'.format(nominal, value)
 
 
-@unittest.skip('')
+@pytest.mark.skip('')
 def test_formula_from_triple_exp_paper():
     # Check the formula as it was given by the author
     #
@@ -202,7 +202,7 @@ def test_formula_from_triple_exp_paper():
     print 'Triple pole: Nominal {0} and actual {1}'.format(nominal, value)
 
 
-@unittest.skip('')
+@pytest.mark.skip('')
 def test_regular_residuer_form_paper():
     # Check the formula as it was given by the author
     #
@@ -215,6 +215,7 @@ def test_regular_residuer_form_paper():
         nominal, value)
 
 
+@pytest.mark.onlylocal
 def test_new_parameters():
     sqrts = 0.194180E+02
     model, parameters = Eikonal('triples'), Parameter.parameters(

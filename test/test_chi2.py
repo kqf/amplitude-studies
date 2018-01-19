@@ -1,3 +1,4 @@
+import pytest
 from amplitude.datapoint import DataPoint
 from amplitude.models import Eikonal
 from amplitude.parameter import Parameter
@@ -39,6 +40,7 @@ def run_chi2(model, parameters, data):
     print 'Chi^2/ndf {0} for {1} points'.format(chi2 / npoints, npoints)
 
 
+@pytest.mark.onlylocal
 def test_linear_model():
     model, parameters = Eikonal('triples'), Parameter.parameters(
         'triple_exp_parameters.dat')
