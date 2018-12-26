@@ -1,8 +1,3 @@
-# Set of files to debug, study amplitude parametrization
-
-
-TODO: 
-
-- Clean the code
-- Add/Fix tests
-- Add minimization (if it's needed).
+# Amplitude analysis [![Build Status](https://travis-ci.com/kqf/amplitude-studies.svg?branch=master)](https://travis-ci.com/kqf/amplitude-studies)
+This is a set of files to debug, study amplitude $A(s, t)$ parametrization.
+Try to use this project for actual minimization in the future.

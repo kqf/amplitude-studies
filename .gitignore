@@ -9,3 +9,4 @@ alldata_v1_4.dat
 *.sublime-workspace
 *.sortie
 .python-version
+.DS_Store
